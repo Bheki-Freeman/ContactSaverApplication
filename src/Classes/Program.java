@@ -44,20 +44,41 @@ public class Program {
                 insertData(conn.getConnection());
                 break;
             case 2:
-                searchCustomer();
+                searchCustomer(conn.getConnection());
                 break;
             case 3:
                 removeCustomer();
+                break;
+            default:
+                System.out.println("Unexpected input");
         }
     }
 
     //short display
-    private  void display(){
-        System.out.println("\n 1. ------ Home");
+    private  void display() throws SQLException {
+        System.out.println("\n1. ------ Home");
         System.out.println("2. ------ Search Customer");
         System.out.println("3. ------- Display All Customers");
         System.out.println("0. ------- Quit");
 
+        int response = user_input.nextInt();
+        switch (response){
+            case 1:
+                new Program();
+                break;
+            case 2:
+                searchCustomer(conn.getConnection());
+                break;
+            case 3:
+                fetchData(conn.getConnection());
+                display();
+                break;
+            case 0:
+                System.exit(1);
+                break;
+            default:
+                System.out.println("UnExpected input!");
+        }
     }
 
     //insert data
@@ -90,14 +111,32 @@ public class Program {
     }
 
     //search
-    private void searchCustomer(){
+    private void searchCustomer(Connection connect) throws SQLException {
+        String sql = "SELECT * FROM customers WHERE user_id=?";
+        System.out.println("Enter customer id to search: ");
+        int custid = user_input.nextInt();
 
+        PreparedStatement pst = connect.prepareStatement(sql);
+        pst.setInt(1, custid);
+        rs = pst.executeQuery();
+        while(rs.next()){
+            System.out.println("** \tCustomer Details \t**");
+            System.out.println(" ID \t Name \t Phone \t Email");
+            System.out.println("---------------------------------------");
+            int u_id = rs.getInt("user_id");
+            String u_name = rs.getString("user_name");
+            int u_phone = rs.getInt("user_phone");
+            String u_mail = rs.getString("user_email");
+
+            System.out.println(u_id + "\t " + u_name + "\t " + u_phone + "\t " + u_mail);
+            System.out.println("---------------------------------------");
+        }
         //
         display();
     }
 
     //remove
-    private void removeCustomer(){
+    private void removeCustomer() throws SQLException {
         //
         display();
     }
@@ -109,7 +148,7 @@ public class Program {
         rs = pst.executeQuery();
 
         //While
-        System.out.println("** \tCustomer Details \t**");
+        System.out.println("** \tCustomers Details \t**");
         System.out.println(" ID \t Name \t Phone \t Email");
         System.out.println("---------------------------------------");
         while(rs.next()){
