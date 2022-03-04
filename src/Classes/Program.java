@@ -39,18 +39,11 @@ public class Program {
         System.out.println("2. Search Individual Customer");
         System.out.println("3. Remove Customer");
         int choice = user_input.nextInt();
-        switch (choice){
-            case 1:
-                insertData(conn.getConnection());
-                break;
-            case 2:
-                searchCustomer(conn.getConnection());
-                break;
-            case 3:
-                removeCustomer();
-                break;
-            default:
-                System.out.println("Unexpected input");
+        switch (choice) {
+            case 1 -> insertData(conn.getConnection());
+            case 2 -> searchCustomer(conn.getConnection());
+            case 3 -> removeCustomer(conn.getConnection());
+            default -> System.out.println("Unexpected input");
         }
     }
 
@@ -62,22 +55,15 @@ public class Program {
         System.out.println("0. ------- Quit");
 
         int response = user_input.nextInt();
-        switch (response){
-            case 1:
-                new Program();
-                break;
-            case 2:
-                searchCustomer(conn.getConnection());
-                break;
-            case 3:
+        switch (response) {
+            case 1 -> new Program();
+            case 2 -> searchCustomer(conn.getConnection());
+            case 3 -> {
                 fetchData(conn.getConnection());
                 display();
-                break;
-            case 0:
-                System.exit(1);
-                break;
-            default:
-                System.out.println("UnExpected input!");
+            }
+            case 0 -> System.exit(1);
+            default -> System.out.println("UnExpected input!");
         }
     }
 
@@ -136,7 +122,16 @@ public class Program {
     }
 
     //remove
-    private void removeCustomer() throws SQLException {
+    private void removeCustomer(Connection conn) throws SQLException {
+        System.out.println("Enter customer id to remove: ");
+        String sql = "DELETE FROM customers WHERE user_id=?";
+        int customer_id = user_input.nextInt();
+
+        PreparedStatement pst = conn.prepareStatement(sql);
+        pst.setInt(1,customer_id);
+        pst.executeUpdate();
+
+        System.out.println("Customer Removed!");
         //
         display();
     }
@@ -182,12 +177,7 @@ public class Program {
         while(rs.next()){
             int userid = rs.getInt("user_id");
             String userpass = rs.getString("user_pass");
-            if(user_id == userid && user_pass.equals(userpass)){
-                is_login_successful = true;
-            }
-            else {
-                is_login_successful = false;
-            }
+            is_login_successful = user_id == userid && user_pass.equals(userpass);
         }
         return  is_login_successful;
     }
